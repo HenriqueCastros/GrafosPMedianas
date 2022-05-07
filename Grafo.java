@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class Grafo {
     private int numEdges;
     private int numNodes;
@@ -63,5 +65,39 @@ public class Grafo {
 
     public void setNumNodes(int numNodes) {
         this.numNodes = numNodes;
-    }    
+    }
+
+    @Override
+    public String toString() {
+        String strRepresentation = "";
+        for (int i = 0; i < 5; i++) {   
+            for (int j = 0; j < 5; j++) {
+                int num = this.edgesWeights[i][j];
+                if (num == Integer.MAX_VALUE)
+                    strRepresentation += "inf";
+                else
+                    strRepresentation += num;
+                strRepresentation += "\t";
+            }
+            strRepresentation += "\n";
+        }
+        return "Grafo [numEdges=" + numEdges + ", numNodes="
+                + numNodes + "]\n" +strRepresentation;
+    }
+    
+    public static String graphMatrixToString(int weigths[][]) {
+        String strRepresentation = "";
+        for (int i = 0; i < 5; i++) {   
+            for (int j = 0; j < 5; j++) {
+                int num = weigths[i][j];
+                if (num == Integer.MAX_VALUE)
+                    strRepresentation += "inf";
+                else
+                    strRepresentation += num;
+                strRepresentation += "\t";
+            }
+            strRepresentation += "\n";
+        }
+        return strRepresentation;
+    }
 }
