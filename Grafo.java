@@ -1,13 +1,19 @@
 import java.util.Arrays;
 
 public class Grafo {
+    private boolean isDirectional = true; 
     private int numEdges;
     private int numNodes;
     public int edgesWeights[][];
 
-    public Grafo(int numEdges, int numNodes) {
+    public Grafo(int numEdges, int numNodes){
+        this(numEdges, numNodes, false);
+    }
+
+    public Grafo(int numEdges, int numNodes, boolean isDirectional) {
         this.numEdges = numEdges;
         this.numNodes = numNodes;
+        this.isDirectional = isDirectional;
         this.edgesWeights = new int[numNodes][numNodes];
 
         for (int i = 0; i < numNodes; i++) {
@@ -37,6 +43,8 @@ public class Grafo {
 
     public void setEdge0Indexed(int fromNode, int toNode, int weight) {
         this.edgesWeights[fromNode][toNode] = weight;
+        if (!this.isDirectional)
+            this.edgesWeights[toNode][fromNode] = weight;
     }
 
     public void setEdge(int fromNode, int toNode, int weight) {

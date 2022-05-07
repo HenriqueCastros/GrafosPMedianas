@@ -7,7 +7,6 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String[] args) {
-        boolean isDirectional = true; 
         Grafo grafo = null;
         int pMedians = 0;
 
@@ -17,7 +16,7 @@ public class Main {
             int numEdges = scanner.nextInt();
             pMedians = scanner.nextInt();
 
-            grafo = new Grafo(numEdges, numNodes);
+            grafo = new Grafo(numEdges, numNodes, true);
 
             while(scanner.hasNextInt())
             {
@@ -25,8 +24,6 @@ public class Main {
                 toNode = scanner.nextInt();
                 weight = scanner.nextInt();
                 grafo.setEdge(fromNode, toNode, weight);
-                if (!isDirectional)
-                    grafo.setEdge(toNode, fromNode, weight);
             }
 
         } catch (FileNotFoundException e) {
