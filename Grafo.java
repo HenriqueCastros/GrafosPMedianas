@@ -1,7 +1,7 @@
 public class Grafo {
     private int numEdges;
     private int numNodes;
-    private int edgesWeights[][];
+    public int edgesWeights[][];
 
     public Grafo(int numEdges, int numNodes) {
         this.numEdges = numEdges;
@@ -15,9 +15,26 @@ public class Grafo {
         }
     }
 
+    public int[][] getMinDistanceMatrix() {
+        int minPath[][] = this.edgesWeights.clone();
+
+        for (int k = 0; k < this.getNumNodes(); k++) {
+            for (int i = 0; i < this.getNumNodes(); i++) {
+                for (int j = 0; j < this.getNumNodes(); j++) {
+                    if(minPath[i][k] == Integer.MAX_VALUE || minPath[k][j] == Integer.MAX_VALUE)
+                        minPath[i][j] = minPath[i][j];
+                    else if (minPath[i][j] == Integer.MAX_VALUE)
+                        minPath[i][j] = minPath[i][k] + minPath[k][j];
+                    else if(minPath[i][j] > minPath[i][k] + minPath[k][j])
+                        minPath[i][j] = minPath[i][k] + minPath[k][j];
+                }
+            }
+        }
+        return minPath;
+    }
+
     public void setEdge0Indexed(int fromNode, int toNode, int weight) {
         this.edgesWeights[fromNode][toNode] = weight;
-        this.edgesWeights[toNode][fromNode] = weight;
     }
 
     public void setEdge(int fromNode, int toNode, int weight) {
