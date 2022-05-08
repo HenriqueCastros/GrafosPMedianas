@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 public class Grafo {
     private boolean isDirectional = true; 
     private int numEdges;
@@ -22,6 +20,13 @@ public class Grafo {
             }
         }
     }
+
+    /*
+     * Calculates the minimal distance between nodes
+     * @return matrix [x][y] where:
+     *      x -> fromNode
+     *      y -> toNode
+     */
 
     public int[][] getMinDistanceMatrix() {
         int minPath[][] = this.edgesWeights.clone();
