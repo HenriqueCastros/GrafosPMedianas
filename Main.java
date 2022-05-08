@@ -1,5 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -8,13 +12,13 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Grafo grafo = null;
-        int pMedians = 0;
+        int kCenters = 0;
 
         try (Scanner scanner = new Scanner(new File("instances/test.txt"))) {
             int fromNode, toNode, weight;
             int numNodes = scanner.nextInt();
             int numEdges = scanner.nextInt();
-            pMedians = scanner.nextInt();
+            kCenters = scanner.nextInt();
 
             grafo = new Grafo(numEdges, numNodes, true);
 
@@ -30,16 +34,22 @@ public class Main {
             e.printStackTrace();
         }
 
-        System.out.println((grafo));
-
         int minDist[][] = grafo.getMinDistanceMatrix();
 
         System.out.print(Grafo.graphMatrixToString(minDist));
 
-        // for (int i = 0; i < grafo.getNumNodes(); i++) {
-        //     int w = grafo.getEdgeWeight0Indexed(21, i);
-        //     if (w < Integer.MAX_VALUE)
-        //         System.out.println("fromNode: "+ i +", weight "+ w);
-        // }
+        BruteForceSolver bfSolver = new BruteForceSolver(grafo, kCenters);
+        System.out.println();
+        System.out.println(bfSolver.findBestCenter());
+
+        ArrayList<Integer> toNodes = new ArrayList<Integer>();
+        toNodes.add(0);
+        toNodes.add(1);
+        // System.out.println(bfSolver.getCheapestWithinNode(3, toNodes));
+
+        HashMap<Integer, ArrayList<Integer>> map = bfSolver.distributeNodesToCenters(toNodes);
+        for (Integer key : map.keySet()) {
+            System.out.println(key+" "+ map.get(key));
+        }
     }
 }
