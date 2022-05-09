@@ -14,7 +14,7 @@ public class BruteForceSolver {
         this.costMatrix = grafo.getMinDistanceMatrix();
     }
 
-    public ArrayList<Integer> findBestKCenter(int k) {
+    public ArrayList<Integer> findBestKCenter() {
         ArrayList<Integer> bestCenters = null, toNodes = null;
         int minRadius = Integer.MAX_VALUE;
 

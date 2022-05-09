@@ -39,17 +39,8 @@ public class Main {
         System.out.print(Grafo.graphMatrixToString(minDist));
 
         BruteForceSolver bfSolver = new BruteForceSolver(grafo, kCenters);
-        System.out.println();
-        System.out.println(bfSolver.findBestCenter());
 
-        ArrayList<Integer> toNodes = new ArrayList<Integer>();
-        toNodes.add(0);
-        toNodes.add(1);
-        // System.out.println(bfSolver.getCheapestWithinNode(3, toNodes));
+        System.out.println("Best centers = " + bfSolver.findBestKCenter());
 
-        HashMap<Integer, ArrayList<Integer>> map = bfSolver.distributeNodesToCenters(toNodes);
-        for (Integer key : map.keySet()) {
-            System.out.println(key+" "+ map.get(key));
-        }
     }
 }
