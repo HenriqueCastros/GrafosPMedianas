@@ -14,13 +14,13 @@ public class Main {
         Grafo grafo = null;
         int kCenters = 0;
 
-        try (Scanner scanner = new Scanner(new File("instances/test.txt"))) {
+        try (Scanner scanner = new Scanner(new File("instances/pmed01.txt"))) {
             int fromNode, toNode, weight;
             int numNodes = scanner.nextInt();
             int numEdges = scanner.nextInt();
             kCenters = scanner.nextInt();
 
-            grafo = new Grafo(numEdges, numNodes, true);
+            grafo = new Grafo(numEdges, numNodes);
 
             while(scanner.hasNextInt())
             {
@@ -40,7 +40,7 @@ public class Main {
 
         BruteForceSolver bfSolver = new BruteForceSolver(grafo, kCenters);
 
-        System.out.println("Best centers = " + bfSolver.findBestKCenter());
+        System.out.println("Best centers = " + bfSolver.findBestCenters());
 
     }
 }
