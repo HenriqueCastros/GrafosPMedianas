@@ -1,6 +1,10 @@
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BruteForceSolver {
     private Grafo grafo;
@@ -14,30 +18,79 @@ public class BruteForceSolver {
         this.costMatrix = grafo.getMinDistanceMatrix();
     }
 
-    public ArrayList<Integer> findBestKCenter() {
+    public Map.Entry<ArrayList<Integer>, Integer> findBestCenters() {
+        Map.Entry<ArrayList<Integer>, Integer> centers = null;
+        ArrayList<Integer> bestCenters = null;
+        int minRadius = Integer.MAX_VALUE;
+
+        for (int i = 1; i <= this.kCentros; i++) {
+            centers = this.findBestCenterForNIterative(i);
+
+            int tmp = centers.getValue();
+            if (minRadius > centers.getValue())
+            {
+                bestCenters = (ArrayList<Integer>) centers.getKey().clone();
+                minRadius = tmp;
+            }
+        }
+        
+        return new AbstractMap.SimpleEntry<ArrayList<Integer>, Integer>(bestCenters, minRadius);
+    }
+
+    public Map.Entry<ArrayList<Integer>, Integer> findBestCenterForNIterative(int n) {
+        int r = grafo.getNumNodes();
+        int[] combination = new int[n];
+
         ArrayList<Integer> bestCenters = null, toNodes = null;
         int minRadius = Integer.MAX_VALUE;
 
-        for (int i = 0; i < grafo.getNumNodes(); i++) {
-            for (int j = i+1; j < grafo.getNumNodes(); j++) {
+        for (int i = 0; i < n; i++)
+            combination[i] = i;
 
-                toNodes = new ArrayList<Integer>();
-                toNodes.add(i);
-                toNodes.add(j);
+        while (combination[n - 1] < r){
+            toNodes = new ArrayList<>(Arrays.stream(combination).boxed().collect(Collectors.toList()));
+            HashMap<Integer, ArrayList<Integer>> map = this.distributeNodesToCenters(toNodes);
+            map = this.getDistancesToCenters(map);
 
-                HashMap<Integer, ArrayList<Integer>> map = this.distributeNodesToCenters(toNodes);
-                map = this.getDistancesToCenters(map);
+            int tmp = this.findMaxRadiusOfDistribution(map);
+            if (minRadius > tmp)
+            {
+                bestCenters = (ArrayList<Integer>) toNodes.clone();
+                minRadius = tmp;
+            }
 
-                int tmp = this.findMaxRadiusOfDistribution(map);
-                if (minRadius > tmp)
-                {
-                    bestCenters = (ArrayList<Integer>) toNodes.clone();
-                    minRadius = tmp;
-                }
+            int t = n - 1;
+            while (t != 0 && combination[t] == r - n + t)
+                t--;
+            combination[t]++;
+            for (int i = t + 1; i < n; i++) {
+                combination[i] = combination[i - 1] + 1;
             }
         }
+        return new AbstractMap.SimpleEntry<ArrayList<Integer>, Integer>(bestCenters, minRadius);
+    }
 
-        return bestCenters;
+    public Map.Entry<ArrayList<Integer>, Integer> findBestCenterForN(int n) {
+        ArrayList<Integer> bestCenters = null, toNodes = null;
+        ArrayList<int[]> combinations = null;
+        int minRadius = Integer.MAX_VALUE;
+
+        combinations = Util.generateCombinatios(grafo.getNumNodes(), n);
+
+        for (int[] combination : combinations){
+            toNodes = new ArrayList<>(Arrays.stream(combination).boxed().collect(Collectors.toList()));
+
+            HashMap<Integer, ArrayList<Integer>> map = this.distributeNodesToCenters(toNodes);
+            map = this.getDistancesToCenters(map);
+
+            int tmp = this.findMaxRadiusOfDistribution(map);
+            if (minRadius > tmp)
+            {
+                bestCenters = (ArrayList<Integer>) toNodes.clone();
+                minRadius = tmp;
+            }
+        }
+        return new AbstractMap.SimpleEntry<ArrayList<Integer>, Integer>(bestCenters, minRadius);
     }
 
     public int findMaxRadiusOfDistribution(HashMap<Integer, ArrayList<Integer>> distributedNodes)
