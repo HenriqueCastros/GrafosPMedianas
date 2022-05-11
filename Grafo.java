@@ -48,24 +48,25 @@ public class Grafo {
         }
         return minPath;
     }
-
-    public void setEdge0Indexed(int fromNode, int toNode, int weight) {
-        this.numEdges ++;
+    
+    public void setEdge(int fromNode, int toNode, int weight) {
+        if (getEdgeWeight(fromNode, toNode) == Integer.MAX_VALUE)
+            this.numEdges ++;
         this.edgesWeights[fromNode][toNode] = weight;
         if (!this.isDirectional)
             this.edgesWeights[toNode][fromNode] = weight;
     }
 
-    public void setEdge(int fromNode, int toNode, int weight) {
-        this.setEdge0Indexed(fromNode - 1, toNode - 1, weight);
-    }
-
-    public int getEdgeWeight0Indexed(int fromNode, int toNode) {
-        return this.edgesWeights[fromNode][toNode];
+    public void setEdge1Indexed(int fromNode, int toNode, int weight) {
+        this.setEdge(fromNode - 1, toNode - 1, weight);
     }
 
     public int getEdgeWeight(int fromNode, int toNode) {
-        return this.getEdgeWeight0Indexed(fromNode, toNode);
+        return this.edgesWeights[fromNode][toNode];
+    }
+
+    public int getEdgeWeight1Indexed(int fromNode, int toNode) {
+        return this.getEdgeWeight(fromNode-1, toNode-1);
     }
 
     public int getNumEdges() {
@@ -136,9 +137,10 @@ public class Grafo {
 
         for (int i = 0; i < numNodes; i++)
             visited[i] = false;
-
+        
         while (visitQueue.size() > 0) {
             int node = visitQueue.remove(0);
+            if (visited[node]) continue;
 
             for (int i = 0; i < numNodes; i++) {
                 if (edgesWeights[node][i] != Integer.MAX_VALUE) {
@@ -149,15 +151,16 @@ public class Grafo {
                     }
                 }
             }
+            visited[node] = true;
         }
-
+        
         return false;
     }
 
     public static String graphMatrixToString(int weigths[][]) {
         String strRepresentation = "";
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
+        for (int i = 0; i < weigths.length; i++) {
+            for (int j = 0; j < weigths[i].length; j++) {
                 int num = weigths[i][j];
                 if (num == Integer.MAX_VALUE)
                     strRepresentation += "inf";

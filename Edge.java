@@ -1,5 +1,3 @@
-import javax.print.attribute.standard.MediaSize.Other;
-
 public class Edge implements Comparable<Edge>{
     public int from;
     public int to;

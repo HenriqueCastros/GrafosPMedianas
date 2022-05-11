@@ -9,16 +9,44 @@ public class MSTSolver {
         this.grafo = grafo;
         this.kCentros = kCentros;
     }
-
+    
     public Grafo buildMST() {
         Grafo g = new Grafo(grafo.getNumNodes(), grafo.isDirectional());
-        Edge e;
-
         ArrayList<Edge> edges = grafo.getAllEdges();
         Collections.sort(edges);
-
+        Edge e;
+        
+        // for (Edge e : edges) {
+        //     if (!g.isReachableFrom(e.from, e.to)) {
+        //         g.setEdge(e.from, e.to, e.weight);
+        //     }
+        // }
         int i = 0;
         while (i < edges.size() && g.getNumEdges() < (g.getNumNodes() - 1)) {
+            // tem alguma coisa dando errado aqui depois da 1a iteração
+            e = edges.get(i);
+            if (!g.isReachableFrom(e.from, e.to)) {
+                g.setEdge(e.from, e.to, e.weight);
+            }
+            i++;
+        }
+        
+        return g;
+    }
+
+    public Grafo buildMSForest() {
+        Grafo g = new Grafo(grafo.getNumNodes(), grafo.isDirectional());
+        ArrayList<Edge> edges = grafo.getAllEdges();
+        Collections.sort(edges);
+        Edge e;
+
+        // for (Edge e : edges) {
+        // if (!g.isReachableFrom(e.from, e.to)) {
+        // g.setEdge(e.from, e.to, e.weight);
+        // }
+        // }
+        int i = 0;
+        while (i < edges.size() && g.getNumEdges() < (g.getNumNodes() - kCentros)) {
             // tem alguma coisa dando errado aqui depois da 1a iteração
             e = edges.get(i);
             if (!g.isReachableFrom(e.from, e.to)) {

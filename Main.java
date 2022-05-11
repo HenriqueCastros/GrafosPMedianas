@@ -25,7 +25,7 @@ public class Main {
                 fromNode = scanner.nextInt();
                 toNode = scanner.nextInt();
                 weight = scanner.nextInt();
-                grafo.setEdge(fromNode, toNode, weight);
+                grafo.setEdge1Indexed(fromNode, toNode, weight);
             }
 
         } catch (FileNotFoundException e) {
@@ -37,7 +37,8 @@ public class Main {
         // System.out.print(Grafo.graphMatrixToString(minDist));
 
         MSTSolver mst = new MSTSolver(grafo, kCenters);
-        System.out.println(mst.buildMST().getAllEdges());
+        
+        System.out.println(Grafo.graphMatrixToString(mst.buildMSForest().getMinDistanceMatrix()));
         
         // BruteForceSolver bfSolver = new BruteForceSolver(grafo, kCenters);
 
