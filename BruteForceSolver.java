@@ -14,19 +14,21 @@ public class BruteForceSolver {
     public BruteForceSolver(Grafo grafo, int kCentros) {
         this.grafo = grafo;
         this.kCentros = kCentros;
-
+        
         this.costMatrix = grafo.getMinDistanceMatrix();
     }
 
+    @SuppressWarnings("unchecked")
     public Map.Entry<ArrayList<Integer>, Integer> findBestCenters() {
         Map.Entry<ArrayList<Integer>, Integer> centers = null;
         ArrayList<Integer> bestCenters = null;
         int minRadius = Integer.MAX_VALUE;
-
+        
         for (int i = 1; i <= this.kCentros; i++) {
             centers = this.findBestCenterForNIterative(i);
-
+            
             int tmp = centers.getValue();
+
             if (minRadius > centers.getValue())
             {
                 bestCenters = (ArrayList<Integer>) centers.getKey().clone();
@@ -36,7 +38,8 @@ public class BruteForceSolver {
         
         return new AbstractMap.SimpleEntry<ArrayList<Integer>, Integer>(bestCenters, minRadius);
     }
-
+    
+    @SuppressWarnings("unchecked")
     public Map.Entry<ArrayList<Integer>, Integer> findBestCenterForNIterative(int n) {
         int r = grafo.getNumNodes();
         int[] combination = new int[n];
@@ -69,7 +72,8 @@ public class BruteForceSolver {
         }
         return new AbstractMap.SimpleEntry<ArrayList<Integer>, Integer>(bestCenters, minRadius);
     }
-
+    
+    @SuppressWarnings("unchecked")
     public Map.Entry<ArrayList<Integer>, Integer> findBestCenterForN(int n) {
         ArrayList<Integer> bestCenters = null, toNodes = null;
         ArrayList<int[]> combinations = null;
@@ -79,7 +83,7 @@ public class BruteForceSolver {
 
         for (int[] combination : combinations){
             toNodes = new ArrayList<>(Arrays.stream(combination).boxed().collect(Collectors.toList()));
-
+            
             HashMap<Integer, ArrayList<Integer>> map = this.distributeNodesToCenters(toNodes);
             map = this.getDistancesToCenters(map);
 
