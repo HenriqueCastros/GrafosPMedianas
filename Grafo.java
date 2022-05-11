@@ -1,9 +1,13 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Grafo {
     private boolean isDirectional = false;
     private int numEdges;
     private int numNodes;
+    private int kCenters;
     public int edgesWeights[][];
     
     public Grafo(int numNodes) {
@@ -23,6 +27,37 @@ public class Grafo {
         }
     }
 
+    public Grafo(String path) {
+        numEdges = 0;
+        isDirectional = false;
+
+        try (Scanner scanner = new Scanner(new File(path))) {
+            int fromNode, toNode, weight;
+            numNodes = scanner.nextInt();
+            
+            edgesWeights = new int[numNodes][numNodes];
+
+            for (int i = 0; i < numNodes; i++) {
+                for (int j = 0; j < numNodes; j++) {
+                    this.edgesWeights[i][j] = i != j ? Integer.MAX_VALUE : 0;
+                }
+            }
+            
+            /* int numEdges = */scanner.nextInt();
+            kCenters = scanner.nextInt();
+            
+            while (scanner.hasNextInt()) {
+                fromNode = scanner.nextInt();
+                toNode = scanner.nextInt();
+                weight = scanner.nextInt();
+                this.setEdge1Indexed(fromNode, toNode, weight);
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     /*
      * Calculates the minimal distance between nodes
      * 
@@ -32,7 +67,7 @@ public class Grafo {
      */
     public int[][] getMinDistanceMatrix() {
         int minPath[][] = this.edgesWeights.clone();
-
+        
         for (int k = 0; k < this.getNumNodes(); k++) {
             for (int i = 0; i < this.getNumNodes(); i++) {
                 for (int j = 0; j < this.getNumNodes(); j++) {
@@ -87,6 +122,14 @@ public class Grafo {
 
     public boolean isDirectional() {
         return this.isDirectional;
+    }
+
+    public int getKCenters() {
+        return this.kCenters;
+    }
+
+    public void setKCenters(int kCenters) {
+        this.kCenters = kCenters;
     }
 
     /**
