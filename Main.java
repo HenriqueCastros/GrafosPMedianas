@@ -1,9 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Collections;
 import java.util.Scanner;
 
 /**
@@ -14,13 +12,13 @@ public class Main {
         Grafo grafo = null;
         int kCenters = 0;
 
-        try (Scanner scanner = new Scanner(new File("instances/pmed01.txt"))) {
+        try (Scanner scanner = new Scanner(new File("instances/testLeo.txt"))) {
             int fromNode, toNode, weight;
             int numNodes = scanner.nextInt();
             int numEdges = scanner.nextInt();
             kCenters = scanner.nextInt();
-
-            grafo = new Grafo(numEdges, numNodes);
+            
+            grafo = new Grafo(numNodes);
 
             while(scanner.hasNextInt())
             {
@@ -33,14 +31,17 @@ public class Main {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        
+        // int minDist[][] = grafo.getMinDistanceMatrix();
+        
+        // System.out.print(Grafo.graphMatrixToString(minDist));
 
-        int minDist[][] = grafo.getMinDistanceMatrix();
+        MSTSolver mst = new MSTSolver(grafo, kCenters);
+        System.out.println(mst.buildMST().getAllEdges());
+        
+        // BruteForceSolver bfSolver = new BruteForceSolver(grafo, kCenters);
 
-        System.out.print(Grafo.graphMatrixToString(minDist));
-
-        BruteForceSolver bfSolver = new BruteForceSolver(grafo, kCenters);
-
-        System.out.println("Best centers = " + bfSolver.findBestCenters());
+        // System.out.println("Best centers = " + bfSolver.findBestCenters());
 
     }
 }
