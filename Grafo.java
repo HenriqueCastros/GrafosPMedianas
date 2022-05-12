@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class Grafo {
@@ -85,8 +86,13 @@ public class Grafo {
     }
     
     public void setEdge(int fromNode, int toNode, int weight) {
-        if (getEdgeWeight(fromNode, toNode) == Integer.MAX_VALUE)
+        // se for adicionar uma aresta
+        if (weight != Integer.MAX_VALUE && getEdgeWeight(fromNode, toNode) == Integer.MAX_VALUE) 
             this.numEdges ++;
+        // se for remover uma aresta
+        else if (weight == Integer.MAX_VALUE && getEdgeWeight(fromNode, toNode) != Integer.MAX_VALUE)
+            this.numEdges --;
+        
         this.edgesWeights[fromNode][toNode] = weight;
         if (!this.isDirectional)
             this.edgesWeights[toNode][fromNode] = weight;
@@ -136,8 +142,8 @@ public class Grafo {
      * Retorna todos os vértices do grafo em um Array<(from, to), Weight>
      */
     public ArrayList<Edge> getAllEdges() {
-        int start;
         ArrayList<Edge> returnValue = new ArrayList<Edge>();
+        int start;
 
         for (int i = 0; i < numNodes; i++) {
             start = isDirectional ? 0 : i + 1;
@@ -147,8 +153,55 @@ public class Grafo {
                 }
             }
         }
+        
+        return returnValue;
+    }
+
+    public ArrayList<Edge> getAllEdgesFromNode(int node) {
+        ArrayList<Edge> returnValue = new ArrayList<Edge>();
+        
+        for (int i = 0; i < numNodes; i++) {
+            if (i != node && edgesWeights[node][i] != Integer.MAX_VALUE) {
+                returnValue.add(new Edge(node, i, edgesWeights[node][i]));
+            }
+        }
 
         return returnValue;
+    }
+
+    public int calculateExentricity(int node) {
+        PriorityQueue<ComparableTuple<Edge, Integer>> border = new PriorityQueue<ComparableTuple<Edge, Integer>>();
+        int dist[] = new int[numNodes];
+        int excentricity = 0;
+        
+        for (int i = 0; i < numNodes; i++) {
+            dist[i] = Integer.MAX_VALUE;
+        }
+        dist[node] = 0;
+        
+        for (Edge e : getAllEdgesFromNode(node)) {
+            border.add(new ComparableTuple<Edge, Integer>(e, e.weight));
+        }
+        
+        while (!border.isEmpty()) {
+            ComparableTuple<Edge, Integer> tuple = border.remove();
+            Edge e = tuple.getKey();
+            int distance = tuple.getValue();
+            
+            if (dist[e.to] == Integer.MAX_VALUE) {
+                dist[e.to] = distance;
+
+                for (Edge ed : getAllEdgesFromNode(e.to)) {
+                    border.add(new ComparableTuple<Edge, Integer>(ed, ed.weight + distance));
+                }
+            }
+        }
+        
+        for (int i = 0; i < numNodes; i++) {
+            excentricity = dist[i] != Integer.MAX_VALUE && excentricity < dist[i] ? dist[i] : excentricity;
+        }
+        
+        return excentricity;
     }
 
     @Override

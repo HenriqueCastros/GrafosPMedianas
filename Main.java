@@ -1,14 +1,10 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
-
 /**
  * Main
  */
 public class Main {
     public static void main(String[] args) {
-        Grafo grafo;
-        int kCenters;
+        Grafo grafo;// = new Grafo("instances/pmed1.txt");
+        int kCenters;// = grafo.getKCenters();
         for (int i = 1; i<=40; i++) {
             grafo = new Grafo("instances/pmed"+i+".txt");
             kCenters = grafo.getKCenters();
@@ -17,6 +13,8 @@ public class Main {
             System.out.println("BestRadius '"+i+"': "+mst.findBestCenters().getValue());
         }
         
+        // MSTSolver mst = new MSTSolver(grafo, kCenters);
+        // System.out.println("BestRadius : "+mst.findBestCenters());
         // int minDist[][] = grafo.getMinDistanceMatrix();
         
         // System.out.print(Grafo.graphMatrixToString(minDist));

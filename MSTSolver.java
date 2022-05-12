@@ -3,6 +3,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class MSTSolver {
     private Grafo grafo;
@@ -49,9 +50,37 @@ public class MSTSolver {
         return g;
     }
 
+    public Grafo buildMSForestWithPriorityQueue() {
+        Grafo g = new Grafo(grafo.getNumNodes(), grafo.isDirectional());
+        PriorityQueue<ComparableTuple<Edge, Integer>> edges = new PriorityQueue<ComparableTuple<Edge, Integer>>();
+
+        for (Edge e : grafo.getAllEdges()) {
+            edges.add(new ComparableTuple<Edge, Integer>(e, e.weight));
+        }
+
+        while (!edges.isEmpty() && g.getNumEdges() < (g.getNumNodes() - kCentros)) {
+            ComparableTuple<Edge, Integer> tuple = edges.remove();
+            Edge e = tuple.getKey();
+            
+            if (!g.isReachableFrom(e.from, e.to)) {
+                g.setEdge(e.from, e.to, e.weight);
+                int exFrom = g.calculateExentricity(e.from);
+                int exTo = g.calculateExentricity(e.to);
+                int ex = exFrom < exTo ? exFrom : exTo;
+                if (ex > edges.peek().getValue() && ex > tuple.getValue()){
+                    g.setEdge(e.from, e.to, Integer.MAX_VALUE);
+                    tuple.setValue(ex);
+                    edges.add(tuple);
+                }
+            }
+        }
+        
+        return g;
+    }
+
     @SuppressWarnings("unchecked")
     public Map.Entry<ArrayList<Integer>, Integer> findBestCenters() {
-        int[][] subgraphs = this.buildMSForest().getMinDistanceMatrix();
+        int[][] subgraphs = this.buildMSForestWithPriorityQueue().getMinDistanceMatrix();
         boolean[] visited = new boolean[subgraphs.length];
         ArrayList<Integer>[] verticesBySubgraph = new ArrayList[kCentros];
         ArrayList<Integer> centres = new ArrayList<Integer>();
