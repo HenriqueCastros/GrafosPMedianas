@@ -203,6 +203,30 @@ public class Grafo {
         
         return excentricity;
     }
+    
+    public ArrayList<Integer> getReachableNodes(int start) {
+        ArrayList<Integer> visited = new ArrayList<Integer>();
+        ArrayList<Integer> visitQueue = new ArrayList<>();
+        visitQueue.add(start);
+        
+
+        while (visitQueue.size() > 0) {
+            int node = visitQueue.remove(0);
+            if (visited.contains(node))
+                continue;
+
+            for (int i = 0; i < numNodes; i++) {
+                if (edgesWeights[node][i] != Integer.MAX_VALUE) {
+                    if (i != node && !visited.contains(i)) {
+                        visitQueue.add(i);
+                    }
+                }
+            }
+            visited.add(node);
+        }
+
+        return visited;
+    }
 
     @Override
     public String toString() {
@@ -230,7 +254,7 @@ public class Grafo {
         boolean[] visited = new boolean[numNodes];
         ArrayList<Integer> visitQueue = new ArrayList<>();
         visitQueue.add(origin);
-
+        
         for (int i = 0; i < numNodes; i++)
             visited[i] = false;
         
@@ -250,7 +274,7 @@ public class Grafo {
             visited[node] = true;
         }
         
-        return false;
+        return visited[objective];
     }
 
     public static String graphMatrixToString(int weigths[][]) {

@@ -50,6 +50,58 @@ public class MSTSolver {
         return g;
     }
 
+    public Grafo buildMSForestWithPriorityQueueV1() {
+        Grafo g = new Grafo(grafo.getNumNodes(), grafo.isDirectional());
+        PriorityQueue<ComparableTuple<Edge, Integer>> edges = new PriorityQueue<ComparableTuple<Edge, Integer>>();
+
+        for (Edge e : grafo.getAllEdges()) {
+            edges.add(new ComparableTuple<Edge, Integer>(e, e.weight));
+        }
+
+        while (!edges.isEmpty() && g.getNumEdges() < (g.getNumNodes() - kCentros)) {
+            ComparableTuple<Edge, Integer> tuple = edges.remove();
+            Edge e = tuple.getKey();
+
+            if (!g.isReachableFrom(e.from, e.to)) {
+                g.setEdge(e.from, e.to, e.weight);
+                int exFrom = g.calculateExentricity(e.from);
+                int exTo = g.calculateExentricity(e.to);
+                int ex = exFrom < exTo ? exFrom : exTo;
+                if (ex > edges.peek().getValue() && ex > tuple.getValue()) {
+                    g.setEdge(e.from, e.to, Integer.MAX_VALUE);
+                    tuple.setValue(ex);
+                    edges.add(tuple);
+                }
+            }
+        }
+
+        return g;
+    }
+
+    public static int calculateComponentRadius(int[][] graphMatrix, int node) {
+        ArrayList<Integer> vertices = new ArrayList<>();
+        int subgraphRadius = Integer.MAX_VALUE;
+
+        for (int i = 0; i < graphMatrix[node].length; i++) {
+            if (graphMatrix[node][i] != Integer.MAX_VALUE) {
+                vertices.add(i);
+            }
+        }
+
+        for (int n : vertices) {
+            int excentricity = 0;
+            for (int j : vertices) {
+                excentricity = excentricity < graphMatrix[n][j] ? graphMatrix[n][j] : excentricity;
+            }
+
+            if (excentricity < subgraphRadius) {
+                subgraphRadius = excentricity;
+            }
+        }
+
+        return subgraphRadius;
+    }
+    
     public Grafo buildMSForestWithPriorityQueue() {
         Grafo g = new Grafo(grafo.getNumNodes(), grafo.isDirectional());
         PriorityQueue<ComparableTuple<Edge, Integer>> edges = new PriorityQueue<ComparableTuple<Edge, Integer>>();
@@ -64,23 +116,29 @@ public class MSTSolver {
             
             if (!g.isReachableFrom(e.from, e.to)) {
                 g.setEdge(e.from, e.to, e.weight);
-                int exFrom = g.calculateExentricity(e.from);
-                int exTo = g.calculateExentricity(e.to);
-                int ex = exFrom < exTo ? exFrom : exTo;
-                if (ex > edges.peek().getValue() && ex > tuple.getValue()){
+                ArrayList<Integer> reachableNodes = g.getReachableNodes(e.from);
+                
+                int ex = Integer.MAX_VALUE;
+                for (int n : reachableNodes) {
+                    int thisex = g.calculateExentricity(n);
+                    ex = ex < thisex ? ex : thisex;
+                }
+                
+                if (ex > edges.peek().getValue() && ex > tuple.getValue()) {
                     g.setEdge(e.from, e.to, Integer.MAX_VALUE);
                     tuple.setValue(ex);
                     edges.add(tuple);
                 }
             }
         }
-        
+
         return g;
     }
 
     @SuppressWarnings("unchecked")
     public Map.Entry<ArrayList<Integer>, Integer> findBestCenters() {
         int[][] subgraphs = this.buildMSForestWithPriorityQueue().getMinDistanceMatrix();
+        int[][] originalGraph = this.grafo.getMinDistanceMatrix();
         boolean[] visited = new boolean[subgraphs.length];
         ArrayList<Integer>[] verticesBySubgraph = new ArrayList[kCentros];
         ArrayList<Integer> centres = new ArrayList<Integer>();
@@ -110,9 +168,9 @@ public class MSTSolver {
             int subgraphCentre = 0;
             for (int n : verticesBySubgraph[i]) {
                 int excentricity = 0;
-                for (int j = 0; j < subgraphs[n].length; j++) {
-                    excentricity = subgraphs[n][j] != Integer.MAX_VALUE && excentricity < subgraphs[n][j]
-                            ? subgraphs[n][j]
+                for (int j : verticesBySubgraph[i]) {
+                    excentricity = originalGraph[n][j] != Integer.MAX_VALUE && excentricity < originalGraph[n][j]
+                            ? originalGraph[n][j]
                             : excentricity;
                 }
 
@@ -124,16 +182,6 @@ public class MSTSolver {
             centres.add(subgraphCentre);
             radius = radius < subgraphRadius ? subgraphRadius : radius;
         }
-        // for (int i = 1; i <= this.kCentros; i++) {
-        // centers = this.findBestCenterForNIterative(i);
-
-        // int tmp = centers.getValue();
-
-        // if (minRadius > centers.getValue()) {
-        // bestCenters = (ArrayList<Integer>) centers.getKey().clone();
-        // minRadius = tmp;
-        // }
-        // }
 
         return new AbstractMap.SimpleEntry<ArrayList<Integer>, Integer>(centres, radius);
     }
