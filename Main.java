@@ -30,45 +30,45 @@ public class Main {
         long time;
         String algorithim;
 
-        algorithim = "MST V1";
-        for (int i = 1; i <= 40; i++) {
-            grafo = new Grafo("instances/pmed" + i + ".txt");
-            kCenters = grafo.getKCenters();
+        // algorithim = "MST V1";
+        // for (int i = 1; i <= 40; i++) {
+        //     grafo = new Grafo("instances/pmed" + i + ".txt");
+        //     kCenters = grafo.getKCenters();
             
-            MSTSolver solver = new MSTSolver(grafo, kCenters);
+        //     MSTSolver solver = new MSTSolver(grafo, kCenters);
 
-            result = solver.findBestCentersV1();
-            time = solver.getRunTime();
+        //     result = solver.findBestCentersV1();
+        //     time = solver.getRunTime();
 
-            csvWriter = new RandomAccessFile("results.csv", "rw");
-            csvWriter.seek(csvWriter.length());
-            csvWriter.writeUTF(
-                    " , " + i + "," + algorithim + "," + result.getKey().toString().replace(", ", "|") + ","
-                            + result.getValue() + "," + time + "," + executor + "\n");
-            csvWriter.close();
+        //     csvWriter = new RandomAccessFile("results.csv", "rw");
+        //     csvWriter.seek(csvWriter.length());
+        //     csvWriter.writeUTF(
+        //             " , " + i + "," + algorithim + "," + result.getKey().toString().replace(", ", "|") + ","
+        //                     + result.getValue() + "," + time + "," + executor + "\n");
+        //     csvWriter.close();
 
-            System.out.println("BestRadius '" + i + "': " + result.getValue());
-        }
+        //     System.out.println("BestRadius '" + i + "': " + result.getValue());
+        // }
         
-        algorithim = "MST V2";
-        for (int i = 1; i <= 40; i++) {
-            grafo = new Grafo("instances/pmed" + i + ".txt");
-            kCenters = grafo.getKCenters();
+        // algorithim = "MST V2";
+        // for (int i = 1; i <= 40; i++) {
+        //     grafo = new Grafo("instances/pmed" + i + ".txt");
+        //     kCenters = grafo.getKCenters();
             
-            MSTSolver solver = new MSTSolver(grafo, kCenters);
+        //     MSTSolver solver = new MSTSolver(grafo, kCenters);
 
-            result = solver.findBestCenters();
-            time = solver.getRunTime();
+        //     result = solver.findBestCenters();
+        //     time = solver.getRunTime();
 
-            csvWriter = new RandomAccessFile("results.csv", "rw");
-            csvWriter.seek(csvWriter.length());
-            csvWriter.writeUTF(
-                    " , " + i + "," + algorithim + "," + result.getKey().toString().replace(", ", "|") + ","
-                            + result.getValue() + "," + time + "," + executor + "\n");
-            csvWriter.close();
-
-            System.out.println("BestRadius '" + i + "': " + result.getValue());
-        }
+        //     csvWriter = new RandomAccessFile("results.csv", "rw");
+        //     csvWriter.seek(csvWriter.length());
+        //     csvWriter.writeUTF(
+        //             " , " + i + "," + algorithim + "," + result.getKey().toString().replace(", ", "|") + ","
+        //                     + result.getValue() + "," + time + "," + executor + "\n");
+        //     csvWriter.close();
+            
+        //     System.out.println("BestRadius '" + i + "': " + result.getValue());
+        // }
         
         algorithim = "Brute Force";
         for (int i = 1; i <= 40; i++) {
@@ -84,8 +84,8 @@ public class Main {
             csvWriter.seek(csvWriter.length());
             if (time > BruteForceSolver.TIMEOUT) {
                 csvWriter.writeUTF(
-                        " , " + i + "," + algorithim + "," + "TIMEOUT" + ","
-                                + "TIMEOUT" + "," + time + "," + executor + "\n");
+                        " , " + i + "," + algorithim + "," + result.getKey().toString().replace(", ", "|") + ","
+                                + result.getValue() + "," + time + " (TIMEOUT)," + executor + "\n");
             } else {
                 csvWriter.writeUTF(
                         " , " + i + "," + algorithim + "," + result.getKey().toString().replace(", ", "|") + ","
