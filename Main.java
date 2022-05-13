@@ -72,6 +72,7 @@ public class Main {
         
         algorithim = "Brute Force";
         for (int i = 1; i <= 40; i++) {
+            System.out.println("Pmed" + i + ": StartTime: " + new Date());
             grafo = new Grafo("instances/pmed" + i + ".txt");
             kCenters = grafo.getKCenters();
 

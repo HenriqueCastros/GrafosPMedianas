@@ -30,6 +30,7 @@ public class BruteForceSolver {
         
         for (int i = 1; i <= this.kCentros; i++) {
             if (getRunTime() > TIMEOUT) break;
+            System.out.println("Calculando n = "+i);
             centers = this.findBestCenterForNIterative(i);
             
             int tmp = centers.getValue();
