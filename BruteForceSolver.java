@@ -10,6 +10,8 @@ public class BruteForceSolver {
     private Grafo grafo;
     private int kCentros;
     private int[][] costMatrix;
+    private long startTime;
+    static public long TIMEOUT = 3600000;
 
     public BruteForceSolver(Grafo grafo, int kCentros) {
         this.grafo = grafo;
@@ -17,14 +19,17 @@ public class BruteForceSolver {
         
         this.costMatrix = grafo.getMinDistanceMatrix();
     }
-
+    
     @SuppressWarnings("unchecked")
     public Map.Entry<ArrayList<Integer>, Integer> findBestCenters() {
+        startTime = System.currentTimeMillis();
+
         Map.Entry<ArrayList<Integer>, Integer> centers = null;
         ArrayList<Integer> bestCenters = null;
         int minRadius = Integer.MAX_VALUE;
         
         for (int i = 1; i <= this.kCentros; i++) {
+            if (getRunTime() > TIMEOUT) break;
             centers = this.findBestCenterForNIterative(i);
             
             int tmp = centers.getValue();
@@ -37,6 +42,10 @@ public class BruteForceSolver {
         }
         
         return new AbstractMap.SimpleEntry<ArrayList<Integer>, Integer>(bestCenters, minRadius);
+    }
+
+    public long getRunTime() {
+        return System.currentTimeMillis() - startTime;
     }
     
     @SuppressWarnings("unchecked")
@@ -51,6 +60,8 @@ public class BruteForceSolver {
             combination[i] = i;
 
         while (combination[n - 1] < r){
+            if (getRunTime() > TIMEOUT) break;
+            
             toNodes = new ArrayList<>(Arrays.stream(combination).boxed().collect(Collectors.toList()));
             HashMap<Integer, ArrayList<Integer>> map = this.distributeNodesToCenters(toNodes);
             map = this.getDistancesToCenters(map);

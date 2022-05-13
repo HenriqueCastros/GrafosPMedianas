@@ -8,6 +8,11 @@ import java.util.PriorityQueue;
 public class MSTSolver {
     private Grafo grafo;
     private int kCentros;
+    private long startTime;
+
+    public long getRunTime() {
+        return System.currentTimeMillis() - startTime;
+    }
 
     public MSTSolver(Grafo grafo, int kCentros) {
         this.grafo = grafo;
@@ -134,10 +139,19 @@ public class MSTSolver {
 
         return g;
     }
+    
+    public Map.Entry<ArrayList<Integer>, Integer> findBestCentersV1() {
+        startTime = System.currentTimeMillis();
+        return findBestCenters(this.buildMSForestWithPriorityQueueV1().getMinDistanceMatrix());
+    }
+
+    public Map.Entry<ArrayList<Integer>, Integer> findBestCenters() {
+        startTime = System.currentTimeMillis();
+        return findBestCenters(this.buildMSForestWithPriorityQueue().getMinDistanceMatrix());
+    }
 
     @SuppressWarnings("unchecked")
-    public Map.Entry<ArrayList<Integer>, Integer> findBestCenters() {
-        int[][] subgraphs = this.buildMSForestWithPriorityQueue().getMinDistanceMatrix();
+    public Map.Entry<ArrayList<Integer>, Integer> findBestCenters(int[][] subgraphs) {
         int[][] originalGraph = this.grafo.getMinDistanceMatrix();
         boolean[] visited = new boolean[subgraphs.length];
         ArrayList<Integer>[] verticesBySubgraph = new ArrayList[kCentros];
