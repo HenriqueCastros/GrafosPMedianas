@@ -1,0 +1,118 @@
+
+\section{\esp Introdução}
+
+Tarefas de agrupamentos são comuns e diversamente aplicadas em diferentes contextos, sejam esses computacionais ou de outros âmbitos. Dentre elas existe a o problema dos K-Centros, que consiste em encontrar um conjunto K de vértices, ou centros, que minimize a maior distância de um vértice qualquer ao conjunto de escolhido. Essa distância pode ser referida como raio.
+
+Neste trabalho estaremos explorando possíveis soluções para esse problema. No intuito de testar e avaliar o desempenho dos nossos algoritmos utilizaremos as instâncias disponíveis pela \textbf{OR-Library}. Ao fim do trabalho, vamos comparar nossos resultados com os resultados corretos de cada instância, podendo ver o quão correto estariam nossas aproximações.
+
+\section{\esp Implementação}
+
+Para desenvolver a solução do trabalho, utilizamos a linguagem Java. Ela foi escolhida por ser uma linguagem que permite implementar facilmente orientação de objetos e ser relativamente rápida. 
+
+Foram criadas diferentes classes que se complementam na solução, das quais se destacam as classes \textit{Grafos} e as classes que implementam os algoritmos, \textit{BruteForceSolver} e \textit{MSTSolver}. Todas as classes foram escritas de forma a rodar em uma única \textit{Thread} de execução.
+
+\subsection{\esp Classe Grafos}
+
+A classe Grafo foi desenvolvida para ser a principal estrutura de dados utilizada durante o trabalho. Apesar dos exercícios serem para grafos não direcionados, implementamos a classe de forma que ela também para grafos direcionados, o atributo \textit{isDirectional} faz o controle dessa característica do grafo, tendo o \textit{default} como falso.
+
+Utilizamos de uma matriz de adjacência para armazenar as arestas e seus respectivos pesos, dentro da classe a matriz pode ser acessada por meio do atributo \textit{edgesWeights}. Fora a facilidade de utilização e implementação, a matriz de adjacência permite calcular os caminhos mínimos por meio do algoritmo de Floyd-Warshall de forma simples, a matriz resultante desse algoritmo pode ser gerada por meio do método \textit{getMinDistanceMatrix}.
+
+Outros métodos que valem destacar são \textit{calculateExentricity} e \textit{isReachableFrom}. O primeiro método calcula a excentricidade de um dado nó, que é usado em alguns métodos de outras classes que serão apresentadas. Para chegar ao resultado desse método utilizamos o algoritmo de busca de custo uniforme, que garante encontrar uma resposta se possível. O segundo método retorna uma valor booleano, que indica se dada uma origem é possível atingir outro vértice, por meio da busca em largura.
+
+Fora os métodos explicitados acima, construímos outros métodos auxiliares que utilizam pesos na matriz de adjacência, adicionar vértices ou arestas, e outras funções que julgamos necessárias.
+
+\subsection{\esp Algoritmos} \label{algoritmos}
+
+Para resolver o problema, a primeira abordagem a se tomar é a força bruta, que garantidamente encontrará a melhor solução ao custo da performance do algoritmo. Ela consiste de testar todas as combinações possíveis dos K-Centros e escolher a combinação que possui o melhor resultado. A classe responsável por realizar essa solução é a \textit{BruteForceSolver}.
+
+A segunda abordagem que encontra uma solução é buscar uma aproximação, que não garantidamente vai encontrar os melhor centros para um problema mas performa de forma mais rápida que a outra solução. A classe que implementa essa forma de solução é a \textit{MSTSolver}.
+
+\subsubsection{\esp Algoritmo de Força Bruta}
+
+A classe \textit{BruteForceSolver} é a classe responsável por encontrar, garantidamente, uma resposta. Para tal, implementamos um algoritmo de força, não otimizado, e por essa razão em alguns cenários de teste, nossa solução saiu por \textit{TIMEOUT}, como será abordado na seção \ref{sec:resultados}.
+
+Por ser um algoritmo de força bruta, o seu funcionamento é relativamente simples. Para cada k calculamos quais os melhores centros e uma vez tendo calculado para todos os k’s, calculamos com qual quantidade de centros encontramos o melhor resultado.
+
+O método responsável por encontrar os melhores para um dado k é \textit{findBestCenterForN}, e sua variante iterativa \textit{findBestCenterForNIterative}. Para cada combinação de centros possível, o método distribui os vértices para os centros mais próximos, por meio do método \textit{distributeNodesToCenters}, e calcula o maior raio dessa distribuição, \textit{findMaxRadiusOfDistribution}. Uma variável auxiliar é utilizada para guardar qual o menor raio encontrado até então e quais os centros da combinação. Em primeiro momento geramos as combinações de forma recursiva e guardávamos em uma variável. Contudo, assim que foi testado em um grafo, percebeu-se que o método estourava a memória primária. Por causa disso o método \textit{findBestCenterForNIterative} foi desenvolvido, que gera as combinações de forma iterativa e a cada iteração ele guarda apenas os centros que possuem o menor raio.
+
+ \subsubsection{\esp Algoritmo de Árvores Geradoras}
+
+Para o algoritmo heurístico decidimos utilizar o conceito de árvores
+geradoras mínimas para obter os componentes de raio mínimo. Ao construirmos uma floresta com as \textit{n-k} menores arestas, podemos garantir um limite superior para o algoritmo, e otimizar essa geração de componentes para obter melhores valores.
+
+Para esse algoritmo inicial foi utilizado como base o algoritmo de Kruskal, onde a quantidade de inserções foi alterada de \textit{|E(T)| - 1} para \textit{|E(T)| - k}, sendo \textit{k} a quantidade de centros desejados, garantindo que \textit{k} árvores serão geradas.
+
+\subsubsubsection{\esp Versão 1}
+
+Para a primeira versão do algoritmo de geração de floresta, inicializa-se um grafo com todos os vértices do grafo original e uma fila de prioridade com cada uma das arestas do grafo e seus pesos como valor. E a partir dessa fila, as arestas são retiradas em ordem até que \textit{|E(T)| - k} arestas sejam inseridas ou a fila esteja vazia.
+
+Para a inserção, primeiro é verificado se uma das extremidades da aresta é alcançável a partir da outra, descartando a aresta quando for, e inserida temporariamente no grafo quando não for. Se a aresta for inserida, então calcula-se a excentricidade das extremidades da aresta dentro do componente onde se encontram, e é obtida a excentricidade da aresta a partir do mínimo entre esses valores. Essa aresta então é removida da árvore caso sua excentricidade seja maior que o valor da próxima aresta da fila, e retornada com um novo valor igual a sua excentricidade. Isso garante que somente arestas que aumentem pouco a excentricidade dos componentes sejam inseridas.
+
+ \subsubsubsection{\esp Versão 2}
+
+Para a segunda versão, a maior alteração é que o cálculo de excentricidade da aresta ao invés de ser feito somente nas extremidades da aresta, todos os vértices alcançáveis por essas extremidades são buscados e o raio do componente é calculado.
+
+\section{\esp Análise de Resultados} \label{sec:resultados}
+
+
+Nessa seção analisaremos o desempenho de cada um dos algoritmos em relação a tempo e precisão para obter o resultado.
+
+\subsection{\esp Experimentos}
+
+Para cada instância, executamos cada um dos algoritmos descrito na seção \ref{algoritmos}, em um processador Intel Core i5 7a geração 2.5GHz. Dentre as instâncias a serem testadas, algumas possuem um tamanho considerável, que afetam principalmente o desempenho do algoritmo de força bruta. Dessa forma para conseguir calcular todos em tempo hábil, determinamos um tempo limite de 1 hora, que se alcançado, a execução é abortada e o melhor resultado até então é retornado. 
+
+Na Tabela \ref{tab:results} conseguimos ver os resultados dos algoritmos para cada instância, onde nos casos onde o tempo de execução excedeu o tempo limite temos o rótulo \textit{TIMEOUT}.
+
+\begin{table}[h]
+\centering
+\csvautotabular[respect all]{AnaliseGrafos.csv}
+\caption{Resultados}
+\label{tab:results}
+\end{table}
+
+\subsection{\esp Análise Comparativa}
+
+\begin{figure}
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includesvg[width=1\linewidth]{tempoxV}
+  \caption{|V| x \% do tempo gasto por V2}
+    \label{fig:tempoxv} 
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includesvg[width=1\linewidth]{tempoxk}
+  \caption{k x \% do tempo gasto por V2}
+    \label{fig:tempoxk} 
+\end{minipage}
+\end{figure}
+
+Após o processamento de todos os grafos pelo algoritmo de força bruta, nota-se que para todas as instâncias exceto a 1, obtivemos \textit{TIMEOUT}, isso se dá por conta da quantidade de combinações que o algoritmo de força bruta precisa de calcular para obter o resultado. Para comparação, a instância 1 possui 79.375.495 possíveis combinações de centros enquanto a próxima menor instância (6), possui 2.601.668.490, pouco mais de 32x mais combinações, tornando seu cálculo inviável em tempo hábil.
+
+Tratando dos algoritmos heurísticos, todas as instâncias foram processadas dentro do tempo estipulado tanto para a versão 1 quanto para a 2 do algoritmo de árvores geradoras. Mas nota-se que a versão 2, pela quantidade de operações que precisam ser feitas para calcular o raio dos componentes toma mais tempo para finalizar. Enquanto a versão 1 levou 1 minuto e 26 segundos para processar todas as instâncias, a versão 2 levou 41 minutos e 55 segundos (por volta de 30 vezes mais lento). Essa diferença é acentuada para k pequenos e |V| grandes como pode ser visto nas Figuras \ref{fig:tempoxv} e \ref{fig:tempoxk}
+
+Na questão dos resultados, os dois algoritmos obtiveram resultados com baixa variação, com a versão 1 obtendo um resultado médio de 127\% o valor real do raio, e a versão 2 123\%, esses resultados também foram regulares se comparados a |V| e k, portanto não há uma perda de qualidade quando trabalhando com instâncias maiores. A diferença entre os resultados dos algoritmos não foi grande, com as maiores melhoras sendo de por volta de 20\%. Observando os resultados das instâncias 6, 11, 32 e 38, nota-se que a versão 2 não é sempre melhor que a 1. 
+
+\begin{figure}
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includesvg[width=1\linewidth]{chartkresult}  
+  \caption{k x resultados obtidos}
+  \label{fig:vresult} 
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includesvg[width=1\linewidth]{chartvresult}  
+  \caption{|V| x resultados obtidos}
+  \label{fig:kresult} 
+\end{minipage}
+\end{figure}
+
+\section{\esp Conclusão}
+
+Tendo em vista a análise acima, diferentes observações podem ser feitas.
+Apesar de encontrar soluções que possuem uma margem de erro relativamente alta, a solução aproximada conseguiu encontrar solução para todas as soluções sem tomar \textit{TIMEOUT}, em ambas as suas versões.
+
+A solução de força bruta, devido à complexidade das instâncias, foi inefetiva para encontrar soluções. Como observado em seções anteriores, a implementação dos algoritmos foi feita para serem rodados em um única Thread de execução. Uma possível melhoria seria implementar os algoritmos de forma paralela, permitindo a redução do tempo de execução.
